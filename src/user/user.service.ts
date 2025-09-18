@@ -43,8 +43,7 @@ export class UserService {
     return { data, page, limit, total };
   }
 
-  // ===== Mutations
-  // src/user/user.service.ts
+  
   async create(data: Partial<User>) {
     await this.ensureEmailFree(data.email!);
     const u = this.repo.create(data);

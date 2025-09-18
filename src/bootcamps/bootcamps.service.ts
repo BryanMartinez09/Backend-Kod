@@ -18,6 +18,7 @@ export class BootcampsService {
   get(id: number) {
     return this.repo.findOne({ where: { id } });
   }
+  
 
   create(data: Partial<Bootcamp>) {
     return this.repo.save(this.repo.create(data));

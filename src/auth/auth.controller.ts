@@ -7,10 +7,10 @@ export class AuthController {
   constructor(private auth: AuthService) {}
 
   @Post('login')
-  async login(@Body() dto: LoginDto) {
-    const u = await this.auth.validateUser(dto.email, dto.password);
-    if (!u) return { ok: false, message: 'Credenciales inválidas' };
-    const token = this.auth.sign(u);
-    return { ok: true, token, user: u };
-  }
+async login(@Body() dto: LoginDto) {
+  const u = await this.auth.validateUser(dto.email, dto.password);
+  if (!u) return { ok: false, message: 'Credenciales inválidas' };
+  const access_token = this.auth.sign(u);
+  return { ok: true, access_token, user: u };
+}
 }
