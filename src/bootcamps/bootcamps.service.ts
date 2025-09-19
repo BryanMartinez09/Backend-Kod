@@ -1,8 +1,7 @@
 import { Injectable } from '@nestjs/common';
 import { InjectRepository } from '@nestjs/typeorm';
-import { Repository, ILike } from 'typeorm';
+import { Repository, Like, Raw } from 'typeorm';
 import { Bootcamp } from './entities/bootcamp.entity';
-
 
 @Injectable()
 export class BootcampsService {
@@ -10,7 +9,17 @@ export class BootcampsService {
 
   list(q?: string) {
     if (q) {
-      return this.repo.find({ where: [{ title: ILike(`%${q}%`) }, { area: ILike(`%${q}%`) }], order: { createdAt: 'DESC' } });
+      // Forzamos case-insensitive incluso si la collation no lo es
+      const needle = q.toLowerCase();
+      return this.repo.find({
+        where: [
+          { title: Raw(alias => `LOWER(${alias}) LIKE '%${needle}%'`) },
+          { area:  Raw(alias => `LOWER(${alias}) LIKE '%${needle}%'`) },
+        ],
+        order: { createdAt: 'DESC' },
+      });
+      // Si tu collation ya es CI puedes usar:
+      // where: [{ title: Like(`%${q}%`) }, { area: Like(`%${q}%`) }]
     }
     return this.repo.find({ order: { createdAt: 'DESC' } });
   }
@@ -18,9 +27,9 @@ export class BootcampsService {
   get(id: number) {
     return this.repo.findOne({ where: { id } });
   }
-  
 
   create(data: Partial<Bootcamp>) {
-    return this.repo.save(this.repo.create(data));
+    const entity = this.repo.create(data);
+    return this.repo.save(entity);
   }
 }
